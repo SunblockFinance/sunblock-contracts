@@ -283,9 +283,9 @@
     }
   ],
   "impls": {
-    "07ba2d697c8247365e05423dc3d7f3ec29b68796dc51e2268662fcfb6efdc9e2": {
+    "141361ac9a14df49481d1649aec2f4dcc956f195741ce531e41f9b506914626d": {
       "address": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
-      "txHash": "0x3030f0ce22f9898a65611a379051af48488c1434eaa430d30e662c44b26804fd",
+      "txHash": "0x6879ba9378760a3d4fbcfe1208d533ebb86171af9090e2ee16e0b43005a8c396",
       "layout": {
         "storage": [
           {
@@ -369,15 +369,15 @@
             "src": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:107"
           },
           {
-            "label": "paymentInstrument",
+            "label": "managementFee",
             "offset": 0,
             "slot": "301",
-            "type": "t_contract(IERC20)2696",
+            "type": "t_uint256",
             "contract": "InvestmentVehicle",
             "src": "contracts/sunblockInvestmentVehicle_v1.sol:22"
           },
           {
-            "label": "managementFee",
+            "label": "investmentPool",
             "offset": 0,
             "slot": "302",
             "type": "t_uint256",
@@ -385,7 +385,7 @@
             "src": "contracts/sunblockInvestmentVehicle_v1.sol:23"
           },
           {
-            "label": "investmentPool",
+            "label": "rewardPool",
             "offset": 0,
             "slot": "303",
             "type": "t_uint256",
@@ -393,7 +393,7 @@
             "src": "contracts/sunblockInvestmentVehicle_v1.sol:24"
           },
           {
-            "label": "rewardPool",
+            "label": "feePool",
             "offset": 0,
             "slot": "304",
             "type": "t_uint256",
@@ -401,10 +401,10 @@
             "src": "contracts/sunblockInvestmentVehicle_v1.sol:25"
           },
           {
-            "label": "feePool",
+            "label": "paymentInstrument",
             "offset": 0,
             "slot": "305",
-            "type": "t_uint256",
+            "type": "t_contract(IERC20)1871",
             "contract": "InvestmentVehicle",
             "src": "contracts/sunblockInvestmentVehicle_v1.sol:26"
           }
@@ -425,7 +425,7 @@
           "t_bytes32": {
             "label": "bytes32"
           },
-          "t_contract(IERC20)2696": {
+          "t_contract(IERC20)1871": {
             "label": "contract IERC20"
           },
           "t_mapping(t_address,t_bool)": {

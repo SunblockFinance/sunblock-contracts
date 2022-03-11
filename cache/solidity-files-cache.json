@@ -534,8 +534,8 @@
       ]
     },
     "/Users/kenth/code/sunblock-contracts/contracts/sunblockInvestmentVehicle_v1.sol": {
-      "lastModificationDate": 1646952523195,
-      "contentHash": "994fc181e7e0227f584be391021c85ab",
+      "lastModificationDate": 1646972311948,
+      "contentHash": "a1eec81531a846c9d7ef6dd882a8038c",
       "sourceName": "contracts/sunblockInvestmentVehicle_v1.sol",
       "solcConfig": {
         "version": "0.8.9",

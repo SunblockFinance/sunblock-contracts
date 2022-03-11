@@ -19,11 +19,11 @@ contract InvestmentVehicle is
   bytes32 public constant UPGRADER_ROLE = keccak256('UPGRADER_ROLE');
   bytes32 public constant MANAGER_ROLE = keccak256('MANAGER_ROLE');
 
-  IERC20 public paymentInstrument; // Token used to be used for investment and reward. This will be later bridged and swapped to vehicle token
   uint256 public managementFee; // Fee taken from the reward prior to distribution. No fee for investment pool. EVER.
   uint256 public investmentPool; // Current stored investment in the pool
   uint256 public rewardPool; // Current stored rewards in the pool
   uint256 public feePool; // This pool collects the fees owed to the manager of the investment vehicle
+  IERC20 public paymentInstrument; // Token used to be used for investment and reward. This will be later bridged and swapped to vehicle token
 
   // ========= EVENTS =========== //
   event InvestmentDeposited(address from, address by, uint256 amount);
@@ -49,11 +49,11 @@ contract InvestmentVehicle is
   }
 
 
-  function depositInvestment(address invPool, uint256 amount) external  onlyRole(MANAGER_ROLE) returns(bool) {
-    bool success = paymentInstrument.transferFrom(invPool, address(this), amount);
+  function depositInvestment(address invPool, uint256 _amount) external  onlyRole(MANAGER_ROLE) returns(bool) {
+    bool success = paymentInstrument.transferFrom(invPool, address(this), _amount);
     require(success, "Unable to deposit funds to contract");
-    investmentPool += amount;
-    emit InvestmentDeposited(invPool, msg.sender, amount);
+    investmentPool += _amount;
+    emit InvestmentDeposited(invPool, msg.sender, _amount);
     return success;
   }
   function withdrawInvestment(address receiver, uint256 amount) external onlyRole(MANAGER_ROLE) returns(bool) {
