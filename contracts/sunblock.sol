@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-
+pragma solidity ^0.8.7;
 /**
              _   _         _     ___ _
  ___ _ _ ___| |_| |___ ___| |_  |  _|_|___ ___ ___ ___ ___
@@ -13,7 +13,7 @@
 
 // contracts/sunblock.sol
 
-pragma solidity ^0.8.7;
+
 import '@openzeppelin/contracts/security/Pausable.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
