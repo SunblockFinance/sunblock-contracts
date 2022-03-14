@@ -7,13 +7,15 @@ import '@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol';
 import '@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol';
+import './ISunblockInvestmentVehicle.sol';
 
 /// @custom:security-contact security@sunblock.finance
 contract InvestmentVehicle is
   Initializable,
   PausableUpgradeable,
   AccessControlUpgradeable,
-  UUPSUpgradeable
+  UUPSUpgradeable,
+  ISunblockInvestmentVehicle
 {
   bytes32 public constant PAUSER_ROLE = keccak256('PAUSER_ROLE');
   bytes32 public constant UPGRADER_ROLE = keccak256('UPGRADER_ROLE');
