@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+pragma solidity ^0.8.9;
 /**
              _   _         _     ___ _
  ___ _ _ ___| |_| |___ ___| |_  |  _|_|___ ___ ___ ___ ___
@@ -9,7 +10,7 @@
 
 // Developed by Kenth Fagerlund (https://github.com/arkalon76)
 // Inspired by the fantastic work by Dogu Deniz UGUR (https://github.com/DoguD)
-pragma solidity ^0.8.9;
+
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import '@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol';
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
@@ -36,6 +37,7 @@ contract cube is
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
     bytes32 public constant MANAGER_ROLE = keccak256("MANAGER_ROLE");
+    bytes32 public constant GOVERNOR_ROLE = keccak256("GOVERNOR_ROLE");
 
     // ========= //
     //  STRUCTS  //
@@ -52,6 +54,7 @@ contract cube is
     event NewShareholder(address shareholder);
     event RewardIssued(address holderAddress, uint256 rewardShare);
     event RewardsDepleted(uint256 _holderno, uint256 rewardBalance);
+    event TargetVehicleFunded(address targetVehicle, uint256 targetAmount);
 
     /**
       This will dictate what funding instrument it accepts and will distribute to investment vehicles.
@@ -61,7 +64,7 @@ contract cube is
     /**
     How much each share in this cube cost
      */
-    uint256 unitcost;
+    uint256 public unitcost;
     /**
     Mapping to all shareholders and their current amount
      */
@@ -84,6 +87,18 @@ contract cube is
      */
     uint256 public rewardsHeld;
 
+    /**
+    The current investment vehicle that will be funded when target amount is reached
+      */
+    address public targetVehicle;
+    /**
+    The amount required to trigger funding of investment target.
+     */
+    uint256 public targetAmount;
+
+
+
+
   //  constructor() initializer {}
 
     function initialize(address _fundingInstrument, uint256 _unitcost) public initializer {
@@ -96,24 +111,30 @@ contract cube is
         _grantRole(PAUSER_ROLE, msg.sender);
         _grantRole(UPGRADER_ROLE, msg.sender);
         _grantRole(MANAGER_ROLE, msg.sender);
+        _grantRole(GOVERNOR_ROLE, msg.sender);
 
         fundingInstrument = IERC20Upgradeable(_fundingInstrument);
         unitcost = _unitcost;
-
     }
 
-    // Queue: Targets
-    // Target: amount, address
 
-    function appendInvestmentTarget(address _target, uint256 _amount) external {
-      
-    }
-    function removeInvestmentTarget(address _target) external {
 
+    function setInvestmentTarget(address _target, uint256 _amount) external onlyRole(GOVERNOR_ROLE) {
+      targetVehicle = _target;
+      targetAmount = _amount;
+      _tryFundingTarget();
     }
-    function isNextTargetReached() internal {
 
+    function _tryFundingTarget() internal returns(bool) {
+      if (targetVehicle != address(0) && investmentHeld >= targetAmount){
+        fundingInstrument.safeTransfer(targetVehicle, targetAmount);
+        emit TargetVehicleFunded(targetVehicle, targetAmount);
+        return true;
+      } else {
+        return false;
+      }
     }
+
 
     function shareHolderCount() external view returns(uint256){
      return EnumerableSetUpgradeable.length(holders);
@@ -142,6 +163,9 @@ contract cube is
 
     //Emit events
     emit SharesIssued(msg.sender, _shareAmount);
+
+    //Let's check if we reached the target amount for the current funding target
+    _tryFundingTarget();
   }
 
   /**
