@@ -90,7 +90,7 @@ contract cube is
     /**
     The current investment vehicle that will be funded when target amount is reached
       */
-    address public targetVehicle;
+    ISunblockInvestmentVehicle public targetVehicle;
     /**
     The amount required to trigger funding of investment target.
      */
@@ -120,15 +120,19 @@ contract cube is
 
 
     function setInvestmentTarget(address _target, uint256 _amount) external onlyRole(GOVERNOR_ROLE) {
-      targetVehicle = _target;
+      targetVehicle = ISunblockInvestmentVehicle(_target);
       targetAmount = _amount;
       _tryFundingTarget();
     }
 
     function _tryFundingTarget() internal returns(bool) {
-      if (targetVehicle != address(0) && investmentHeld >= targetAmount){
-        fundingInstrument.safeTransfer(targetVehicle, targetAmount);
-        emit TargetVehicleFunded(targetVehicle, targetAmount);
+      if (address(targetVehicle) != address(0) && investmentHeld >= targetAmount){
+        if (fundingInstrument.allowance(address(this), address(targetVehicle)) <= targetAmount) {
+          fundingInstrument.safeApprove(address(targetVehicle), 1e18);
+        }
+        targetVehicle.depositInvestment(address(this), targetAmount);
+        emit TargetVehicleFunded(address(targetVehicle), targetAmount);
+        investmentHeld -= targetAmount;
         return true;
       } else {
         return false;
@@ -140,16 +144,15 @@ contract cube is
      return EnumerableSetUpgradeable.length(holders);
   }
 
-    function buyShares(uint256 _shareAmount) external nonReentrant {
-    require(_shareAmount > 0, 'Share amount must be 1 or more');
+    function buyShares(uint256 _shareAmount) external nonReentrant whenNotPaused {
+    require(_shareAmount >= 1, 'Share amount must be 1 or more');
     // Transfer funds into the pool
     uint256 totalCost = unitcost.mul(_shareAmount);
-    bool success = fundingInstrument.transferFrom(
+    fundingInstrument.transferFrom(
       msg.sender,
       address(this),
       totalCost
     );
-    require(success, 'Failed to transfer');
     // Issue shares to the signer.
     Shareholder storage sh = shareholder[msg.sender];
     sh.shares += _shareAmount;
@@ -172,7 +175,7 @@ contract cube is
   Will withdraw rewards from investment Vehicle. Note: The cube need to be managing that specific
   vehicle to be allow to make the withdrawal.
    */
-  function collectRewards(address _vehicle, uint256 _amount) external onlyRole(MANAGER_ROLE) nonReentrant {
+  function collectRewards(address _vehicle, uint256 _amount) external onlyRole(MANAGER_ROLE) whenNotPaused nonReentrant {
     require(_amount > 0, 'Amount must be over 0');
     ISunblockInvestmentVehicle vh = ISunblockInvestmentVehicle(_vehicle);
     vh.withdrawReward(address(this), _amount);
@@ -186,7 +189,7 @@ contract cube is
    * Note that the fee has been taken when rewards were deposited so the full sum
    * is distrubuted at this time
    */
-  function distributeRewards() external onlyRole(MANAGER_ROLE) nonReentrant {
+  function distributeRewards() external onlyRole(MANAGER_ROLE) whenNotPaused nonReentrant {
     // How much reward for each share
     uint256 rewardPerShare = rewardsHeld / sharesIssued;
 

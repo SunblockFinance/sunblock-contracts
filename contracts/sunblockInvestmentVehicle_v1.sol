@@ -51,45 +51,35 @@ contract InvestmentVehicle is
   }
 
 
-  function depositInvestment(address invPool, uint256 _amount) external  onlyRole(MANAGER_ROLE) returns(bool) {
-    bool success = paymentInstrument.transferFrom(invPool, address(this), _amount);
-    require(success, "Unable to deposit funds to contract");
+  function depositInvestment(address invPool, uint256 _amount) external  onlyRole(MANAGER_ROLE) whenNotPaused  {
+    paymentInstrument.transferFrom(invPool, address(this), _amount);
     investmentPool += _amount;
     emit InvestmentDeposited(invPool, msg.sender, _amount);
-    return success;
   }
-  function withdrawInvestment(address receiver, uint256 amount) external onlyRole(MANAGER_ROLE) returns(bool) {
+  function withdrawInvestment(address receiver, uint256 amount) external onlyRole(MANAGER_ROLE) whenNotPaused  {
     require(investmentPool >= amount,'Not enough balance in investment pool for withdrawal');
-    bool success = paymentInstrument.transfer(receiver, amount);
-    require(success, "Unable to withdraw investment funds from contract");
+    paymentInstrument.transfer(receiver, amount);
     investmentPool -= amount;
     emit InvestmentWithdrawn(receiver, msg.sender, amount);
-    return success;
   }
-  function depositReward(address _rewardPool, uint256 _amount) external onlyRole(MANAGER_ROLE) returns(bool) {
+  function depositReward(address _rewardPool, uint256 _amount) external onlyRole(MANAGER_ROLE) whenNotPaused  {
     require(_amount > 0, 'Amount must be over 0');
     uint256 rewardAfterFee = _extractFee(_amount);
-    bool success = paymentInstrument.transferFrom(_rewardPool, address(this), _amount);
-    require(success, 'Unable to deposit rewards');
+    paymentInstrument.transferFrom(_rewardPool, address(this), _amount);
     rewardPool += rewardAfterFee;
     emit RewardDeposited(_rewardPool, msg.sender, _amount);
-    return success;
   }
-  function withdrawReward(address receiver, uint256 _amount) external onlyRole(MANAGER_ROLE) returns(bool) {
+  function withdrawReward(address receiver, uint256 _amount) external onlyRole(MANAGER_ROLE) whenNotPaused {
    require(rewardPool >= _amount, "Not enough balance in reward pool for withdrawal");
-    bool success = paymentInstrument.transfer(receiver, _amount);
-    require(success, "Unable to withdraw reward funds from contract");
+    paymentInstrument.transfer(receiver, _amount);
     rewardPool -= _amount;
     emit RewardWithdrawn(receiver, msg.sender, _amount);
-    return success;
   }
-  function withdrawManagerFee(address receiver, uint256 _amount) external onlyRole(MANAGER_ROLE) returns(bool){
+  function withdrawManagerFee(address receiver, uint256 _amount) external onlyRole(MANAGER_ROLE) whenNotPaused{
     require(feePool >= _amount, "Not enough balance in fee pool for withdrawal");
-    bool success = paymentInstrument.transfer(receiver, _amount);
-    require(success, "Unable to withdraw reward funds from contract");
+    paymentInstrument.transfer(receiver, _amount);
     feePool -= _amount;
     emit FeeWithdrawn(receiver, msg.sender, _amount);
-    return success;
   }
   function _extractFee(uint256 _amount) internal returns(uint256) {
     uint256 rewardAfterFee = (_amount * (1000 - managementFee)) / 1000;

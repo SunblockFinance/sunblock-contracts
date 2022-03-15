@@ -50,4 +50,26 @@ beforeEach(async function () {
         await expect(() => cubeContract.buyShares(10)).to.changeTokenBalance(usdtContract, cubeContract, ethers.utils.parseUnits("100.0", 6))
         expect(await cubeContract.investmentHeld()).to.be.equal(ethers.utils.parseUnits("100.0", 6))
     })
+
+    it('Should revert if trying to buy 0 shares', async () => {
+        await usdtContract.approve(cubeContract.address, BASIC_APPROVAL_AMOUNT_USDT)
+        expect(await usdtContract.allowance(owner.address, cubeContract.address)).to.equal(BASIC_APPROVAL_AMOUNT_USDT);
+        await expect(cubeContract.buyShares(0)).to.be.revertedWith('Share amount must be 1 or more')
+        expect(await cubeContract.investmentHeld()).to.be.equal(ethers.utils.parseUnits("0.0", 6))
+    })
+
+    it('Should emit NewShareholder when its first purchase', async () => {
+        await usdtContract.approve(cubeContract.address, BASIC_APPROVAL_AMOUNT_USDT)
+        expect(await usdtContract.allowance(owner.address, cubeContract.address)).to.equal(BASIC_APPROVAL_AMOUNT_USDT);
+        await expect(cubeContract.buyShares(10)).to.emit(cubeContract, 'NewShareholder').withArgs(owner.address)
+        expect(await cubeContract.investmentHeld()).to.be.equal(ethers.utils.parseUnits("100.0", 6))
+    })
+    it('Should NOT emit NewShareholder when its second purchase', async () => {
+        await usdtContract.approve(cubeContract.address, BASIC_APPROVAL_AMOUNT_USDT)
+        expect(await usdtContract.allowance(owner.address, cubeContract.address)).to.equal(BASIC_APPROVAL_AMOUNT_USDT);
+        await expect(cubeContract.buyShares(10)).to.emit(cubeContract, 'NewShareholder').withArgs(owner.address)
+        await expect(cubeContract.buyShares(10)).to.not.emit(cubeContract, 'NewShareholder').withArgs(owner.address)
+        expect(await cubeContract.investmentHeld()).to.be.equal(ethers.utils.parseUnits("200.0", 6))
+    })
+
 })

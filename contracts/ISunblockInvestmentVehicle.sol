@@ -8,16 +8,14 @@ interface ISunblockInvestmentVehicle {
     /// @dev Token to fund the contract is dictated by the contract itself.
     /// @param invPool address from where funds are deposited.
     /// @param _amount wei amount of supported token to deposit.
-    /// @return true if successful
-    function depositInvestment(address invPool, uint256 _amount) external  returns(bool);
+    function depositInvestment(address invPool, uint256 _amount) external;
 
     /// @notice Allows for managers of this vehicle to withdraw investment funds
     /// @dev funds withdrawn is always in the currency of the contract when it was initialized
     /// @param receiver address to where the funds should be sent
     /// @param amount wei amount of supported token to withdraw to receiver
-    /// @return Documents the return variables of a contract’s function state variable
-    function withdrawInvestment(address receiver, uint256 amount) external returns(bool);
-    function depositReward(address _rewardPool, uint256 _amount) external returns(bool);
-    function withdrawReward(address receiver, uint256 _amount) external returns(bool);
-    function withdrawManagerFee(address receiver, uint256 _amount) external returns(bool);
+    function withdrawInvestment(address receiver, uint256 amount) external;
+    function depositReward(address _rewardPool, uint256 _amount) external;
+    function withdrawReward(address receiver, uint256 _amount) external;
+    function withdrawManagerFee(address receiver, uint256 _amount) external;
 }

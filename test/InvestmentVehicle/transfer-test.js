@@ -132,6 +132,16 @@ describe('InvestmentVehicle.withdrawReward', () => {
     await expect(() => vehicleContract.depositReward(owner.address, 200)).to.changeTokenBalance(usdtContract, vehicleContract, 200)
     await expect(() => vehicleContract.withdrawReward(owner.address, 50)).to.changeTokenBalance(usdtContract, vehicleContract, -50)
   })
+  it('Should NOT allow deposit 0 reward', async () => {
+    await usdtContract.approve(vehicleContract.address, 2000)
+    expect(await usdtContract.allowance(owner.address, vehicleContract.address)).to.equal(2000);
+    await expect(vehicleContract.depositReward(owner.address, 0)).to.revertedWith('Amount must be over 0')
+  })
+  it('Should should not allow withdrawal when rewards funds are lower than withdraw', async () => {
+    await usdtContract.approve(vehicleContract.address, 2000)
+    expect(await usdtContract.allowance(owner.address, vehicleContract.address)).to.equal(2000);
+    await expect(vehicleContract.withdrawReward(owner.address, 50)).to.revertedWith('Not enough balance in reward pool for withdrawal')
+  })
   it('Should not reduce reward pool when withdrawing on low balance', async () => {
     await usdtContract.approve(vehicleContract.address, 2000)
     expect(await usdtContract.allowance(owner.address, vehicleContract.address)).to.equal(2000);
@@ -169,6 +179,7 @@ describe('InvestmentVehicle.withdrawManagerFee', () => {
     await expect(() => vehicleContract.depositReward(owner.address, 200)).to.changeTokenBalance(usdtContract, vehicleContract, 200)
     await expect(() => vehicleContract.withdrawManagerFee(owner.address, 20)).to.changeTokenBalance(usdtContract, vehicleContract, -20)
   })
+
   it('Should not reduce fee pool when withdrawing on low balance', async () => {
     await usdtContract.approve(vehicleContract.address, 2000)
     expect(await usdtContract.allowance(owner.address, vehicleContract.address)).to.equal(2000);
@@ -196,4 +207,6 @@ describe('InvestmentVehicle.withdrawManagerFee', () => {
     expect(vehicleContract.withdrawManagerFee(owner.address, 10))
     expect(await vehicleContract.feePool()).to.be.equal(10)
   })
+
+
 })
