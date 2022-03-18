@@ -12,16 +12,17 @@ pragma solidity ^0.8.9;
 // Inspired by the fantastic work by Dogu Deniz UGUR (https://github.com/DoguD)
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import '@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol';
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
-import '@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol';
-import '@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol';
-import './ISunblockInvestmentVehicle.sol';
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/structs/EnumerableSetUpgradeable.sol";
+import "./ISunblockInvestmentVehicle.sol";
+
 
 contract cube is
     Initializable,
@@ -43,7 +44,7 @@ contract cube is
     //  STRUCTS  //
     // ========= //
     struct Shareholder {
-      uint256 shares;
+        uint256 shares;
     }
 
     // ========== //
@@ -87,21 +88,27 @@ contract cube is
      */
     uint256 public rewardsHeld;
 
+
+    // ======= Investment Queue ======== //
+
     /**
-    The current investment vehicle that will be funded when target amount is reached
-      */
-    ISunblockInvestmentVehicle public targetVehicle;
-    /**
-    The amount required to trigger funding of investment target.
+    Current investment vehicle where funds are being accumulated
      */
-    uint256 public targetAmount;
+    address public currentVehicle;
+    uint256 public currentTargetAmount;
+
+    /**
+    Next investment vehicle that will replace the current when target amount has been
+    reached for the current vehicle and fund been sent to it.
+     */
+    address public nextVehicle;
+    uint256 public nextTargetAmount;
 
 
-
-
-  //  constructor() initializer {}
-
-    function initialize(address _fundingInstrument, uint256 _unitcost) public initializer {
+    function initialize(address _fundingInstrument, uint256 _unitcost)
+        public
+        initializer
+    {
         __Pausable_init();
         __AccessControl_init();
         __UUPSUpgradeable_init();
@@ -117,100 +124,123 @@ contract cube is
         unitcost = _unitcost;
     }
 
-
-
-    function setInvestmentTarget(address _target, uint256 _amount) external onlyRole(GOVERNOR_ROLE) {
-      targetVehicle = ISunblockInvestmentVehicle(_target);
-      targetAmount = _amount;
-      _tryFundingTarget();
-    }
-
-    function _tryFundingTarget() internal returns(bool) {
-      if (address(targetVehicle) != address(0) && investmentHeld >= targetAmount){
-        if (fundingInstrument.allowance(address(this), address(targetVehicle)) <= targetAmount) {
-          fundingInstrument.safeApprove(address(targetVehicle), 1e18);
+    function setInvestmentTarget(address _target, uint256 _amount)
+        external
+        onlyRole(GOVERNOR_ROLE)
+    {
+        if (currentVehicle == address(0)) {
+            currentVehicle = _target;
+            currentTargetAmount = _amount;
+        } else {
+            nextVehicle = _target;
+            nextTargetAmount = _amount;
         }
-        targetVehicle.depositInvestment(address(this), targetAmount);
-        emit TargetVehicleFunded(address(targetVehicle), targetAmount);
-        investmentHeld -= targetAmount;
-        return true;
-      } else {
-        return false;
-      }
     }
 
-
-    function shareHolderCount() external view returns(uint256){
-     return EnumerableSetUpgradeable.length(holders);
-  }
-
-    function buyShares(uint256 _shareAmount) external nonReentrant whenNotPaused {
-    require(_shareAmount >= 1, 'Share amount must be 1 or more');
-    // Transfer funds into the pool
-    uint256 totalCost = unitcost.mul(_shareAmount);
-    fundingInstrument.transferFrom(
-      msg.sender,
-      address(this),
-      totalCost
-    );
-    // Issue shares to the signer.
-    Shareholder storage sh = shareholder[msg.sender];
-    sh.shares += _shareAmount;
-    bool newHolder = EnumerableSetUpgradeable.add(holders, msg.sender);
-    if (newHolder) {
-      emit NewShareholder(msg.sender);
+    function _tryFundingTarget() internal returns (bool) {
+        address tv = currentVehicle;
+        require(currentTargetAmount > 0, "Target amount is too damn low");
+        if (tv != address(0) && investmentHeld >= currentTargetAmount) {
+            if (
+                fundingInstrument.allowance(address(this), tv) <= currentTargetAmount
+            ) {
+                fundingInstrument.safeApprove(tv, 1e18);
+            }
+            ISunblockInvestmentVehicle vehicleContract = ISunblockInvestmentVehicle(
+                    tv
+                );
+            vehicleContract.depositInvestment(address(this), currentTargetAmount);
+            emit TargetVehicleFunded(tv, currentTargetAmount);
+            investmentHeld -= currentTargetAmount;
+            currentVehicle = nextVehicle;
+            nextVehicle = address(0);
+            return true;
+        } else {
+            return false;
+        }
     }
-    // Issue shares to the signer.
-    sharesIssued += _shareAmount;
-    investmentHeld += totalCost;
 
-    //Emit events
-    emit SharesIssued(msg.sender, _shareAmount);
+    function shareHolderCount() external view returns (uint256) {
+        return EnumerableSetUpgradeable.length(holders);
+    }
 
-    //Let's check if we reached the target amount for the current funding target
-    _tryFundingTarget();
-  }
+    function buyShares(uint256 _shareAmount)
+        external
+        nonReentrant
+        whenNotPaused
+    {
+        require(_shareAmount >= 1, "Share amount must be 1 or more");
+        // Transfer funds into the pool
+        uint256 totalCost = unitcost.mul(_shareAmount);
+        fundingInstrument.transferFrom(msg.sender, address(this), totalCost);
+        // Issue shares to the signer.
+        Shareholder storage sh = shareholder[msg.sender];
+        sh.shares += _shareAmount;
+        bool newHolder = EnumerableSetUpgradeable.add(holders, msg.sender);
+        if (newHolder) {
+            emit NewShareholder(msg.sender);
+        }
+        // Issue shares to the signer.
+        sharesIssued += _shareAmount;
+        investmentHeld += totalCost;
 
-  /**
+        //Emit events
+        emit SharesIssued(msg.sender, _shareAmount);
+
+        //Let's check if we reached the target amount for the current funding target
+        _tryFundingTarget();
+    }
+
+    /**
   Will withdraw rewards from investment Vehicle. Note: The cube need to be managing that specific
   vehicle to be allow to make the withdrawal.
    */
-  function collectRewards(address _vehicle, uint256 _amount) external onlyRole(MANAGER_ROLE) whenNotPaused nonReentrant {
-    require(_amount > 0, 'Amount must be over 0');
-    ISunblockInvestmentVehicle vh = ISunblockInvestmentVehicle(_vehicle);
-    vh.withdrawReward(address(this), _amount);
-    rewardsHeld += _amount;
-    emit CollectedReward(address(this), _amount, _vehicle);
-  }
+    function collectRewards(address _vehicle, uint256 _amount)
+        external
+        onlyRole(MANAGER_ROLE)
+        whenNotPaused
+        nonReentrant
+    {
+        require(_amount > 0, "Amount must be over 0");
+        ISunblockInvestmentVehicle vh = ISunblockInvestmentVehicle(_vehicle);
+        vh.withdrawReward(address(this), _amount);
+        rewardsHeld += _amount;
+        emit CollectedReward(address(this), _amount, _vehicle);
+    }
 
     /**
-   *
-   * @dev Will distribute the rewards to shareholder.
-   * Note that the fee has been taken when rewards were deposited so the full sum
-   * is distrubuted at this time
-   */
-  function distributeRewards() external onlyRole(MANAGER_ROLE) whenNotPaused nonReentrant {
-    // How much reward for each share
-    uint256 rewardPerShare = rewardsHeld / sharesIssued;
+     *
+     * @dev Will distribute the rewards to shareholder.
+     * Note that the fee has been taken when rewards were deposited so the full sum
+     * is distrubuted at this time
+     */
+    function distributeRewards()
+        external
+        onlyRole(MANAGER_ROLE)
+        whenNotPaused
+        nonReentrant
+    {
+        // How much reward for each share
+        uint256 rewardPerShare = rewardsHeld / sharesIssued;
 
-    // Check that we have rewards enough to distribute
-    require(rewardsHeld > 0, 'No rewards to distribute');
+        // Check that we have rewards enough to distribute
+        require(rewardsHeld > 0, "No rewards to distribute");
 
-    // Loop though all shareholders so we can issue their share
-    uint256 _holderno = EnumerableSetUpgradeable.length(holders);
-    for (uint256 i = 0; i < _holderno; ++i) {
-      // How many shares does the holder have?
-      address holderAddr = EnumerableSetUpgradeable.at(holders, i);
-      Shareholder memory holder = shareholder[holderAddr];
+        // Loop though all shareholders so we can issue their share
+        uint256 _holderno = EnumerableSetUpgradeable.length(holders);
+        for (uint256 i = 0; i < _holderno; ++i) {
+            // How many shares does the holder have?
+            address holderAddr = EnumerableSetUpgradeable.at(holders, i);
+            Shareholder memory holder = shareholder[holderAddr];
 
-      // How much is his/her/their share
-      uint256 rewardShare = rewardPerShare * holder.shares;
-      fundingInstrument.safeTransfer(holderAddr, rewardShare);
-      rewardsHeld -= rewardShare;
-      emit RewardIssued(holderAddr, rewardShare);
+            // How much is his/her/their share
+            uint256 rewardShare = rewardPerShare * holder.shares;
+            fundingInstrument.safeTransfer(holderAddr, rewardShare);
+            rewardsHeld -= rewardShare;
+            emit RewardIssued(holderAddr, rewardShare);
+        }
+        emit RewardsDepleted(_holderno, rewardsHeld);
     }
-    emit RewardsDepleted(_holderno, rewardsHeld);
-  }
 
     function pause() public onlyRole(PAUSER_ROLE) {
         _pause();
@@ -225,6 +255,4 @@ contract cube is
         override
         onlyRole(UPGRADER_ROLE)
     {}
-
-
 }
