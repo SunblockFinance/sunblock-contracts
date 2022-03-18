@@ -137,6 +137,10 @@ contract cube is
         }
     }
 
+    function triggerFundingCheck() external onlyRole('GOVERNOR_ROLE') {
+        _tryFundingTarget();
+    }
+
     function _tryFundingTarget() internal returns (bool) {
         address tv = currentVehicle;
         require(currentTargetAmount > 0, "Target amount is too damn low");
