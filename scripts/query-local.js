@@ -22,7 +22,10 @@ async function getStats(cubeContract, vehicleContract) {
     console.log(" ==== CUBE ==== ");
     console.log("Investment Held:", await cube.investmentHeld())
     console.log("Rewards Held:", await cube.rewardsHeld())
-    console.log("Target amount:", await cube.targetAmount())
+    console.log("Current Vehicle:", await cube.currentVehicle())
+    console.log("Current Target Amount:", await cube.currentTargetAmount())
+    console.log("Next Vehicle:", await cube.nextVehicle())
+    console.log("Next Target Amount:", await cube.nextTargetAmount())
     console.log("Shares Issued:", await cube.sharesIssued())
     console.log("Unit Cost:", await cube.unitcost())
     console.log(" ==== CUBE ==== ");

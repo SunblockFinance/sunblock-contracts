@@ -19,8 +19,10 @@ async function setInvestmentVehicleForCube(cubeContract, vehicleContract, target
     const Cube = await ethers.getContractFactory("cube");
     const cube = await Cube.attach(cubeContract);
     await cube.setInvestmentTarget(vehicleContract, targetAmountWei)
-    const result = await cube.targetVehicle()
+    const result = await cube.currentVehicle()
+    const amount = await cube.currentTargetAmount()
     console.log("Target vehicle is set to : ", result)
+    console.log("Target amount is ", amount)
 }
 
 async function main() {

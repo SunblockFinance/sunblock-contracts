@@ -39,6 +39,7 @@ describe("Cube.setInvestmentTarget", () => {
       kind: "uups",
     });
     await vehicleContract.deployed();
+    await vehicleContract.grantRole(ethers.utils.id('MANAGER_ROLE'), cubeContract.address)
   });
 
   it("Should be trigger funding when adding vechicle with funding below current invested amount", async () => {
@@ -68,4 +69,12 @@ describe("Cube.setInvestmentTarget", () => {
     expect(await cubeContract.nextVehicle()).to.be.equal(vehicleContract.address);
     expect(await cubeContract.nextTargetAmount()).to.be.equal(ethers.utils.parseUnits("30.0", 6));
   });
+  it("Should trigger funding of vehicle when target amount exceeded", async () => {
+
+    expect(await cubeContract.setInvestmentTarget(vehicleContract.address, ethers.utils.parseUnits("800.0", 6)));
+    expect(await usdtContract.balanceOf(cubeContract.address)).be.equal(0)
+    expect(await usdtContract.approve(cubeContract.address, ethers.utils.parseUnits('10000.0', 6)))
+    expect(await cubeContract.buyShares(100))
+    expect(await usdtContract.balanceOf(cubeContract.address)).be.equal(ethers.utils.parseUnits('200.0', 6))
+  })
 });
