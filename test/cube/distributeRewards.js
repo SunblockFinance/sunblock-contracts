@@ -4,7 +4,11 @@ const { expect } = require('chai')
 const { ethers, upgrades } = require('hardhat')
 const { BN, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
 
-let cubeContract
+
+
+  describe('Cube.distributeRewards', function () {
+
+    let cubeContract
 let usdtContract
 let vehicleContract
 
@@ -39,6 +43,7 @@ beforeEach(async function () {
     { initializer: 'initialize', kind: 'uups' }
   )
     await vehicleContract.deployed()
+    await cubeContract.setInvestmentTarget(vehicleContract.address, ethers.utils.parseUnits("5000.0", 6))
 
     // DEPOSIT REWARD AND INVESTMENTS
     await usdtContract.approve(vehicleContract.address, ethers.utils.parseUnits('2000.0', 6))
@@ -64,8 +69,6 @@ beforeEach(async function () {
     await expect(() => cubeContract.connect(addr2).buyShares(5)).to.changeTokenBalance(usdtContract, cubeContract, ethers.utils.parseUnits("50.0", 6))
     expect(await cubeContract.shareHolderCount()).to.be.equal(2)
   })
-
-  describe('Cube.distributeRewards', function () {
 
     it('Should distribute the full sum of rewards', async () => {
         await expect(() => cubeContract.collectRewards(vehicleContract.address, vehicleContract.rewardPool() )).to.changeTokenBalance(usdtContract, cubeContract, ethers.utils.parseUnits('225.0', 6))

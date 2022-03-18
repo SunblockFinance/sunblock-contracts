@@ -4,34 +4,47 @@ const { expect } = require('chai')
 const { ethers, upgrades } = require('hardhat')
 const { BN, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
 
-let cubeContract
-let usdtContract
 
-const BASIC_APPROVAL_AMOUNT_USDT = ethers.utils.parseUnits("200.0", 6)
-
-beforeEach(async function () {
-    ;[owner, addr1, addr2, ...addrs] = await ethers.getSigners()
-
-    MANAGER_ROLE = ethers.utils.id('MANAGER_ROLE')
-    UPGRADER_ROLE = ethers.utils.id('UPGRADER_ROLE')
-    PAUSER_ROLE = ethers.utils.id('PAUSER_ROLE')
-
-    const USDT = await ethers.getContractFactory('Tether')
-    usdtContract = await USDT.deploy()
-    await usdtContract.deployed()
-
-    // Get the ContractFactory and Signers here.
-    const Cube = await ethers.getContractFactory('cube')
-    cubeContract = await upgrades.deployProxy(
-      Cube,
-      [usdtContract.address, 10000000n],
-      { initializer: 'initialize', kind: 'uups' }
-    )
-    await cubeContract.deployed()
-  })
 
   describe('Cube.buyShares', function () {
-    it('Should update balance on deposit and update sharesIssued', async () => {
+    let cubeContract
+    let usdtContract
+    const BASIC_APPROVAL_AMOUNT_USDT = ethers.utils.parseUnits("200.0", 6)
+    beforeEach(async function () {
+      ;[owner, addr1, addr2, ...addrs] = await ethers.getSigners()
+
+      MANAGER_ROLE = ethers.utils.id('MANAGER_ROLE')
+      UPGRADER_ROLE = ethers.utils.id('UPGRADER_ROLE')
+      PAUSER_ROLE = ethers.utils.id('PAUSER_ROLE')
+
+      const USDT = await ethers.getContractFactory('Tether')
+      usdtContract = await USDT.deploy()
+      await usdtContract.deployed()
+
+      // SETUP INVESTMENT VEHICLE
+    const Vehicle = await ethers.getContractFactory("InvestmentVehicle");
+    vehicleContract = await upgrades.deployProxy(Vehicle, [usdtContract.address, 100], {
+      initializer: "initialize",
+      kind: "uups",
+    });
+    await vehicleContract.deployed();
+
+      // Get the ContractFactory and Signers here.
+      const Cube = await ethers.getContractFactory('cube')
+      cubeContract = await upgrades.deployProxy(
+        Cube,
+        [usdtContract.address, 10000000n],
+        { initializer: 'initialize', kind: 'uups' }
+      )
+      await cubeContract.deployed()
+
+
+      expect(await cubeContract.setInvestmentTarget(vehicleContract.address, ethers.utils.parseUnits("5000.0", 6)));
+
+    });
+
+    it('Should updates balance on deposit and update sharesIssued', async () => {
+      expect(await cubeContract.currentTargetAmount()).to.be.equal(ethers.utils.parseUnits("5000.0", 6));
       await usdtContract.approve(cubeContract.address, BASIC_APPROVAL_AMOUNT_USDT)
       expect(await usdtContract.allowance(owner.address, cubeContract.address)).to.equal(BASIC_APPROVAL_AMOUNT_USDT);
       await expect(() => cubeContract.buyShares(10)).to.changeTokenBalance(usdtContract, cubeContract, ethers.utils.parseUnits("100.0", 6))

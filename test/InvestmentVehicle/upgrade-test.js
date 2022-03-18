@@ -15,27 +15,30 @@ let MANAGER_ROLE;
 let UPGRADER_ROLE;
 let PAUSER_ROLE;
 
-beforeEach(async function () {
-  [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
 
-  MANAGER_ROLE = ethers.utils.id("MANAGER_ROLE");
-  UPGRADER_ROLE = ethers.utils.id("UPGRADER_ROLE");
-  PAUSER_ROLE = ethers.utils.id("PAUSER_ROLE");
-
-  const USDT = await ethers.getContractFactory("Tether");
-  usdtContract = await USDT.deploy();
-  await usdtContract.deployed();
-
-  // Get the ContractFactory and Signers here.
-  const Vehicle = await ethers.getContractFactory("InvestmentVehicle");
-  vehicleContract = await upgrades.deployProxy(Vehicle, [usdtContract.address, 100], {
-    initializer: "initialize",
-    kind: "uups",
-  });
-  await vehicleContract.deployed();
-});
 
 describe("Upgrading contract", () => {
+
+  beforeEach(async function () {
+    [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
+
+    MANAGER_ROLE = ethers.utils.id("MANAGER_ROLE");
+    UPGRADER_ROLE = ethers.utils.id("UPGRADER_ROLE");
+    PAUSER_ROLE = ethers.utils.id("PAUSER_ROLE");
+
+    const USDT = await ethers.getContractFactory("Tether");
+    usdtContract = await USDT.deploy();
+    await usdtContract.deployed();
+
+    // Get the ContractFactory and Signers here.
+    const Vehicle = await ethers.getContractFactory("InvestmentVehicle");
+    vehicleContract = await upgrades.deployProxy(Vehicle, [usdtContract.address, 100], {
+      initializer: "initialize",
+      kind: "uups",
+    });
+    await vehicleContract.deployed();
+  });
+
   it("Should upgrade contract without modifying data", async () => {
     // Adding test data in v1 contract
     await usdtContract.approve(vehicleContract.address, 2000);
