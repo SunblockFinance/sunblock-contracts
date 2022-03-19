@@ -143,7 +143,6 @@ contract cube is
 
     function _tryFundingTarget() internal returns (bool) {
         address tv = currentVehicle;
-        require(currentTargetAmount > 0, "Target amount is too damn low");
         if (tv != address(0) && investmentHeld >= currentTargetAmount) {
             if (
                 fundingInstrument.allowance(address(this), tv) <= currentTargetAmount
@@ -158,6 +157,7 @@ contract cube is
             investmentHeld -= currentTargetAmount;
             currentVehicle = nextVehicle;
             nextVehicle = address(0);
+            nextTargetAmount = 0;
             return true;
         } else {
             return false;
