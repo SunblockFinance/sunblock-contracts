@@ -33,7 +33,7 @@ describe("Cube.collectRewards", function () {
 
     // SETUP INVESTMENT VEHICLE
     const Vehicle = await ethers.getContractFactory("InvestmentVehicle");
-    vehicleContract = await upgrades.deployProxy(Vehicle, [usdtContract.address, 100], {
+    vehicleContract = await upgrades.deployProxy(Vehicle, [ethers.utils.formatBytes32String('test name 👍'),usdtContract.address, 100], {
       initializer: "initialize",
       kind: "uups",
     });

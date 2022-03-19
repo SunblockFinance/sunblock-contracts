@@ -28,7 +28,7 @@ describe("InvestmentVehicle.depositInvestment", function () {
 
     // Get the ContractFactory and Signers here.
     const Vehicle = await ethers.getContractFactory("InvestmentVehicle");
-    vehicleContract = await upgrades.deployProxy(Vehicle, [usdtContract.address, 100], {
+    vehicleContract = await upgrades.deployProxy(Vehicle, [ethers.utils.formatBytes32String('test name 👍'),usdtContract.address, 100], {
       initializer: "initialize",
       kind: "uups",
     });
@@ -93,7 +93,7 @@ describe("InvestmentVehicle.withdrawInvestment", () => {
 
     // Get the ContractFactory and Signers here.
     const Vehicle = await ethers.getContractFactory("InvestmentVehicle");
-    vehicleContract = await upgrades.deployProxy(Vehicle, [usdtContract.address, 100], {
+    vehicleContract = await upgrades.deployProxy(Vehicle, [ethers.utils.formatBytes32String('test name 👍'),usdtContract.address, 100], {
       initializer: "initialize",
       kind: "uups",
     });
@@ -175,7 +175,7 @@ describe("InvestmentVehicle.depositRewards", () => {
 
     // Get the ContractFactory and Signers here.
     const Vehicle = await ethers.getContractFactory("InvestmentVehicle");
-    vehicleContract = await upgrades.deployProxy(Vehicle, [usdtContract.address, 100], {
+    vehicleContract = await upgrades.deployProxy(Vehicle, [ethers.utils.formatBytes32String('test name 👍'),usdtContract.address, 100], {
       initializer: "initialize",
       kind: "uups",
     });
@@ -248,7 +248,7 @@ describe("InvestmentVehicle.withdrawReward", () => {
 
     // Get the ContractFactory and Signers here.
     const Vehicle = await ethers.getContractFactory("InvestmentVehicle");
-    vehicleContract = await upgrades.deployProxy(Vehicle, [usdtContract.address, 100], {
+    vehicleContract = await upgrades.deployProxy(Vehicle, [ethers.utils.formatBytes32String('test name 👍'),usdtContract.address, 100], {
       initializer: "initialize",
       kind: "uups",
     });
@@ -355,7 +355,7 @@ describe("InvestmentVehicle.withdrawManagerFee", () => {
 
     // Get the ContractFactory and Signers here.
     const Vehicle = await ethers.getContractFactory("InvestmentVehicle");
-    vehicleContract = await upgrades.deployProxy(Vehicle, [usdtContract.address, 100], {
+    vehicleContract = await upgrades.deployProxy(Vehicle, [ethers.utils.formatBytes32String('test name 👍'),usdtContract.address, 100], {
       initializer: "initialize",
       kind: "uups",
     });

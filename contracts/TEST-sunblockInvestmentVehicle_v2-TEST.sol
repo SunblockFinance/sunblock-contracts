@@ -25,6 +25,8 @@ contract InvestmentVehicleV2UpgradeTest is
   bytes32 public constant UPGRADER_ROLE = keccak256('UPGRADER_ROLE');
   bytes32 public constant MANAGER_ROLE = keccak256('MANAGER_ROLE');
 
+  bytes32 public vehicleName;
+
   uint256 public managementFee; // Fee taken from the reward prior to distribution. No fee for investment pool. EVER.
   uint256 public investmentPool; // Current stored investment in the pool
   uint256 public rewardPool; // Current stored rewards in the pool
@@ -45,7 +47,7 @@ contract InvestmentVehicleV2UpgradeTest is
   /// @custom:oz-upgrades-unsafe-allow constructor
   constructor() initializer {}
 
-  function initialize(address instrument, uint256 fee) public initializer {
+  function initialize(bytes32 _name, address instrument, uint256 fee) public initializer {
     __Pausable_init();
     __AccessControl_init();
     __UUPSUpgradeable_init();
@@ -57,6 +59,7 @@ contract InvestmentVehicleV2UpgradeTest is
 
     paymentInstrument = IERC20(instrument);
     managementFee = fee;
+    vehicleName = _name;
   }
 // ==============================================//
 // =       Danger, Will Robinson, danger!”      =//

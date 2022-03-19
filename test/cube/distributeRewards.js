@@ -39,7 +39,7 @@ beforeEach(async function () {
   const Vehicle = await ethers.getContractFactory('InvestmentVehicle')
   vehicleContract = await upgrades.deployProxy(
     Vehicle,
-    [usdtContract.address, 100],
+    [ethers.utils.formatBytes32String('test name 👍'),usdtContract.address, 100],
     { initializer: 'initialize', kind: 'uups' }
   )
     await vehicleContract.deployed()
