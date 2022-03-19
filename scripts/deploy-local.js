@@ -1,9 +1,12 @@
 // Copyright 2022 Kenth Fagerlund.
 // SPDX-License-Identifier: MIT
 async function main() {
+  const [deployer] = await ethers.getSigners();
+  console.log("Deployed contract with user ", deployer.address)
   let token = await deployToken();
   await deployCube(token);
-  await deployVehicle(token);
+  await deployVehicle('💪 Strong Block',token);
+  await deployVehicle('🚜 Yield Farm',token);
 
 }
 
@@ -11,7 +14,6 @@ async function deployCube(token) {
   // const FUNDING_INSTRUMENT_ADDRESS = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F"; //<USDT> Address to the token that is used to buy shares
   const SHARE_PRICE_ETH = ethers.utils.parseUnits("10.0", 6);
   const [deployer] = await ethers.getSigners();
-  console.log("Deploying contract with the account:", deployer.address);
 
   const Contract = await ethers.getContractFactory("cube");
   cubeContract = await upgrades.deployProxy(Contract, [token, SHARE_PRICE_ETH], {
@@ -23,14 +25,13 @@ async function deployCube(token) {
   console.log(`Cube address:`, cubeContract.address);
 }
 
-async function deployVehicle(token) {
+async function deployVehicle(name, token) {
   // const FUNDING_INSTRUMENT_ADDRESS = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F"; //<USDT> Address to the token that is used to buy shares
 
   const [deployer] = await ethers.getSigners();
-  console.log("Deploying contract with the account:", deployer.address);
 
   const Vehicle = await ethers.getContractFactory("InvestmentVehicle");
-  vehicleContract = await upgrades.deployProxy(Vehicle, [token, 100], {
+  vehicleContract = await upgrades.deployProxy(Vehicle, [ethers.utils.formatBytes32String(name), token, 100], {
     initializer: "initialize",
     kind: "uups",
   });
@@ -42,7 +43,6 @@ async function deployVehicle(token) {
 async function deployToken() {
 
     const [deployer] = await ethers.getSigners();
-    console.log("Deploying contract with the account:", deployer.address);
 
     const USDT = await ethers.getContractFactory('Tether')
   usdtContract = await USDT.deploy()
