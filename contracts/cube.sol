@@ -156,6 +156,7 @@ contract cube is
             emit TargetVehicleFunded(tv, currentTargetAmount);
             investmentHeld -= currentTargetAmount;
             currentVehicle = nextVehicle;
+            currentTargetAmount = nextTargetAmount;
             nextVehicle = address(0);
             nextTargetAmount = 0;
             return true;

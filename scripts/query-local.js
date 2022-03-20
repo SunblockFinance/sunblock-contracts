@@ -14,8 +14,6 @@ async function getStats(cubeContract, vehicleContract) {
     console.log("Reward Pool:", await iv.rewardPool())
     console.log(" ==== VEHICLE ==== ");
     console.log("")
-    console.log("")
-    console.log("")
 
     const Cube = await ethers.getContractFactory("cube");
     const cube = await Cube.attach(cubeContract);
@@ -29,6 +27,9 @@ async function getStats(cubeContract, vehicleContract) {
     console.log("Shares Issued:", await cube.sharesIssued())
     console.log("Unit Cost:", await cube.unitcost())
     console.log(" ==== CUBE ==== ");
+    console.log("")
+
+
 }
 
 
