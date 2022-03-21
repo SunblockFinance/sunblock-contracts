@@ -5,8 +5,8 @@ async function main() {
   console.log("Deployed contract with user ", deployer.address)
   let token = await deployToken();
   await deployCube(token);
-  await deployVehicle('💪 Strong Block',token);
-  await deployVehicle('🚜 Yield Farm',token);
+  await deployVehicle('Strongblock',token);
+  await deployVehicle('Yieldnodes',token);
 
 }
 
