@@ -50,12 +50,12 @@ contract cube is
     // ========== //
     //   EVENTS   //
     // ========== //
-    event SharesIssued(address holder, uint256 sharesIssued);
-    event CollectedReward(address collector, uint256 amount, address vehicle);
-    event NewShareholder(address shareholder);
-    event RewardIssued(address holderAddress, uint256 rewardShare);
+    event SharesIssued(address indexed holder, uint256 sharesIssued);
+    event CollectedReward(address indexed collector, uint256 amount, address indexed vehicle);
+    event NewShareholder(address indexed shareholder);
+    event RewardIssued(address indexed holderAddress, uint256 rewardShare);
     event RewardsDepleted(uint256 _holderno, uint256 rewardBalance);
-    event TargetVehicleFunded(address targetVehicle, uint256 targetAmount);
+    event TargetVehicleFunded(address indexed targetVehicle, uint256 targetAmount);
 
     /**
       This will dictate what funding instrument it accepts and will distribute to investment vehicles.

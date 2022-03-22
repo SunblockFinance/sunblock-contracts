@@ -31,11 +31,11 @@ contract InvestmentVehicle is
 
 
   // ========= EVENTS =========== //
-  event InvestmentDeposited(address from, address by, uint256 amount);
-  event InvestmentWithdrawn(address to, address by, uint256 amount);
-  event RewardDeposited(address from, address by, uint256 amount);
-  event RewardWithdrawn(address to, address by, uint256 amount);
-  event FeeWithdrawn(address to, address by, uint256 amount);
+  event InvestmentDeposited(address indexed from, address indexed by, uint256 amount);
+  event InvestmentWithdrawn(address indexed to, address indexed by, uint256 amount);
+  event RewardDeposited(address indexed from, address indexed by, uint256 amount);
+  event RewardWithdrawn(address indexed to, address indexed by, uint256 amount);
+  event FeeWithdrawn(address indexed to, address indexed by, uint256 amount);
   /// @custom:oz-upgrades-unsafe-allow constructor
   constructor() initializer {}
 
