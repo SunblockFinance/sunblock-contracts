@@ -21,26 +21,13 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  */
 module.exports = {
   solidity: {
-    compilers: [
-      {
-        version: "0.8.2",
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 200,
-          },
-        },
+    version: "0.8.12",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 1000,
       },
-      {
-        version: "0.8.9",
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 200,
-          },
-        },
-      },
-    ],
+    },
   },
   etherscan: {
     // Your API key for Etherscan
@@ -51,7 +38,8 @@ module.exports = {
     }
   },
   networks: {
-    mumbai: {
+    polygonMumbai: {
+      chainId:80001,
       url: process.env.MUMBAI_RPC,
       accounts: [process.env.PRIVATE_KEY],
     },
