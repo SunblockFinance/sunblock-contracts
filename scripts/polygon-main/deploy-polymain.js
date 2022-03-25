@@ -2,16 +2,15 @@
 
 const { ethers } = require("hardhat")
 
+const USDT_TOKEN_ADDRESS = '0xc2132D05D31c914a87C6611C10748AEb04B58e8F'
+
 // SPDX-License-Identifier: MIT
 async function main() {
   const [deployer] = await ethers.getSigners();
   console.log("Deployed contract with user ", deployer.address)
-  // let token = await deployToken();
-  // await deployCube(token);
-  // await deployVehicle('Strongblock',token);
-  // await deployVehicle('Yieldnodes',token);
-  let token = await deploySunburn()
-  await deployGovenor(token);
+  // await deployCube(USDT_TOKEN_ADDRESS);
+  // await deployVehicle('Strongblock',USDT_TOKEN_ADDRESS);
+  await deployVehicle('Yieldnodes',USDT_TOKEN_ADDRESS);
 
 
 }
@@ -71,17 +70,7 @@ async function deployVehicle(name, token) {
   console.log(`Vehicle ${name} contract address:`, vehicleContract.address);
 }
 
-async function deployToken() {
 
-    const [deployer] = await ethers.getSigners();
-
-    const USDT = await ethers.getContractFactory('Tether')
-  usdtContract = await USDT.deploy()
-  await usdtContract.deployed()
-
-    console.log(`Token contract address:`, usdtContract.address);
-    return usdtContract.address
-  }
 
 main()
   .then(() => process.exit(0))

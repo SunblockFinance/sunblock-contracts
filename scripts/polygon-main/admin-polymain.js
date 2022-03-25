@@ -1,9 +1,9 @@
 // Copyright 2022 Kenth Fagerlund.
 // SPDX-License-Identifier: MIT
-const CUBE_ADDRESS = '0xe3d5aD93d841F7cCBcE2c506C9A9a1c587Ba9C9F'
-const TOKEN_ADDRESS = '0x2AF8C95864dAF017906b310C4910C4B1b1E55499'
-const STRONG_NODE = '0x76461B90c86cd411f5d56C1Bb349ae27C645441A'
-const YIELD_FARM = '0x334e65fd4e98b03c25Bcf6797Fe034551E4C2d0B'
+const CUBE_ADDRESS = '0x21A281CE0258A9F7E38B6df5439F6E118BBAabCc'
+const TOKEN_ADDRESS = '0xc2132D05D31c914a87C6611C10748AEb04B58e8F'
+const STRONG_NODE = '0xBBF075ADD207cbf1360d3E0bB0C8C81b016EE4c9'
+const YIELD_NODE = '0x9f5f595018215754Bd64446d8F369eA0726fDFf9'
 
 async function makeCubeOwnerOfVehicle(cubeContract, vehicleContract) {
   try {
@@ -43,10 +43,10 @@ async function setInvestmentVehicleForCube(cubeContract, vehicleContract, target
 }
 
 async function main() {
-    await setInvestmentVehicleForCube(CUBE_ADDRESS, STRONG_NODE, ethers.utils.parseUnits("800.0", 6))
-    await setInvestmentVehicleForCube(CUBE_ADDRESS, YIELD_FARM, ethers.utils.parseUnits("1200.0", 6))
-    await makeCubeOwnerOfVehicle(CUBE_ADDRESS, STRONG_NODE)
-    await makeCubeOwnerOfVehicle(CUBE_ADDRESS, YIELD_FARM)
+    // await setInvestmentVehicleForCube(CUBE_ADDRESS, STRONG_NODE, ethers.utils.parseUnits("1300.0", 6))
+    await setInvestmentVehicleForCube(CUBE_ADDRESS, YIELD_NODE, ethers.utils.parseUnits("600.0", 6))
+    // await makeCubeOwnerOfVehicle(CUBE_ADDRESS, STRONG_NODE)
+    await makeCubeOwnerOfVehicle(CUBE_ADDRESS, YIELD_NODE)
     // await makeCubeOwnerOfVehicle('0x1A814C71D5DCE40Eac810961Cd3Cabf6aDd859E6', STRONG_NODE)
 }
 
