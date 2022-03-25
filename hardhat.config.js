@@ -43,5 +43,10 @@ module.exports = {
       url: process.env.MUMBAI_RPC,
       accounts: [process.env.PRIVATE_KEY],
     },
+    polygonMain: {
+      chainId:137,
+      url: process.env.POLYMAIN_RPC,
+      accounts: [process.env.PRIVATE_KEY],
+    },
   },
-};
+}
