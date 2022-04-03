@@ -5,10 +5,10 @@
 const { ethers } = require("hardhat")
 
 // SPDX-License-Identifier: MIT
-const CUBE_ADDRESS = '0x21A281CE0258A9F7E38B6df5439F6E118BBAabCc'
-const TOKEN_ADDRESS = '0xc2132D05D31c914a87C6611C10748AEb04B58e8F'
-const STRONG_NODE = '0xBBF075ADD207cbf1360d3E0bB0C8C81b016EE4c9'
-const YIELD_NODE = '0x9f5f595018215754Bd64446d8F369eA0726fDFf9'
+const CUBE_ADDRESS = '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0'
+const TOKEN_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3'
+const STRONG_NODE = '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9'
+const YIELD_FARM = '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707'
 
 async function depositReward(cubeContract, vehicleContract) {
     const [deployer] = await ethers.getSigners();
