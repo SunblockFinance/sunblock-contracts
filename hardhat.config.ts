@@ -37,7 +37,8 @@ module.exports = {
       polygon: process.env.POLYSCAN_KEY,
       polygonMumbai: process.env.POLYSCAN_KEY,
       avalanche: process.env.AVAXMAIN_KEY,
-      avalancheFujiTestnet: process.env.AVAXFUJI_KEY
+      avalancheFujiTestnet: process.env.AVAXFUJI_KEY,
+      opera:process.env.FTMMAIN_KEY,
     }
   },
   networks: {
@@ -63,5 +64,12 @@ module.exports = {
       url: process.env.AVAXMAIN_RPC,
       accounts: [process.env.PRIVATE_KEY],
     },
+    ftmMain: {
+      chainId: 250,
+      gasPrice: 'auto',
+      gasMultiplier: 1,
+      url: process.env.FTMMAIN_RPC,
+      accounts: [process.env.PRIVATE_KEY]
+    }
   },
 }

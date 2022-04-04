@@ -98,3 +98,4 @@ typings/
 
 # Environment variables
 .env
+.dccache
